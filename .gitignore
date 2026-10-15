@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+*.backup
+*.backup2
+page.html
+test.py
+config.json
