@@ -3,15 +3,11 @@ from discord.ext import commands, tasks
 import aiohttp
 from bs4 import BeautifulSoup
 import re
-import json
 import os
 
-with open("config.json", "r", encoding="utf-8") as f:
-    config = json.load(f)
-
-TOKEN = os.environ.get("DISCORD_TOKEN", config["token"])
-CATEGORY_ID = int(os.environ.get("CATEGORY_ID", config["category_id"]))
-INTERVAL_MINUTES = int(os.environ.get("INTERVAL_MINUTES", config.get("interval_minutes", 30)))
+TOKEN = os.environ["DISCORD_TOKEN"]
+CATEGORY_ID = int(os.environ["CATEGORY_ID"])
+INTERVAL_MINUTES = int(os.environ.get("INTERVAL_MINUTES", "30"))
 
 URL = "https://wardogs.tools/gold"
 _last_price: str | None = None
