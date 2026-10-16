@@ -9,7 +9,7 @@ TOKEN = os.environ["DISCORD_TOKEN"]
 CATEGORY_ID = int(os.environ["CATEGORY_ID"])
 INTERVAL_MINUTES = int(os.environ.get("INTERVAL_MINUTES", "30"))
 
-URL = "https://wardogs.tools/gold"
+URL = "https://metaforge.app/wardogs/market"
 _last_price: str | None = None
 
 intents = discord.Intents.default()
@@ -41,20 +41,10 @@ async def fetch_gold_price() -> str | None:
     soup = BeautifulSoup(html, "html.parser")
     text = soup.get_text(" ", strip=True)
 
-    today_match = re.search(
-        r"Today'?s price\s*\$\s*([\d,]+)",
-        text,
-        re.IGNORECASE
-    )
-    if today_match:
-        return "$" + today_match.group(1)
-
-    for m in re.finditer(r"\$[\d,]{3,}", text):
-        start = max(0, m.start() - 40)
-        context = text[start:m.start()].lower()
-        if "vs " in context or " on oct" in context or " on sep" in context:
-            continue
-        return m.group(0)
+    # Cena z metaforge.app/wardogs/market: "Current 557,480"
+    match = re.search(r"Current\s+([\d,]+)", text)
+    if match:
+        return "$" + match.group(1)
 
     return None
 
