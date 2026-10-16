@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands, tasks
-import subprocess
+import urllib.request
 import asyncio
 from bs4 import BeautifulSoup
 import re
@@ -22,24 +22,19 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 
 async def fetch_gold_price() -> str | None:
     def _sync_fetch() -> str | None:
-        # curl omija limit 8190 bajtów nagłówka w Pythonie
-        cmd = [
-            "curl",
-            "-sL",
-            "--max-time", "15",
-            "-H", "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36",
-            "-H", "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-            "-H", "Accept-Language: en-US,en;q=0.9",
-            URL,
-        ]
+        headers = {
+            "User-Agent": (
+                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/120.0 Safari/537.36"
+            ),
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Language": "en-US,en;q=0.9",
+        }
         try:
-            result = subprocess.run(
-                cmd, capture_output=True, timeout=20
-            )
-            if result.returncode != 0:
-                print(f"Blad curl (kod {result.returncode}): {result.stderr.decode('utf-8', 'ignore')[:200]}")
-                return None
-            html = result.stdout.decode("utf-8", "ignore")
+            req = urllib.request.Request(URL, headers=headers)
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                html = resp.read().decode("utf-8", "ignore")
         except Exception as e:
             print(f"Blad pobierania: {e}")
             return None
